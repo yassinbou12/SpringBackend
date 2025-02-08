@@ -17,8 +17,8 @@ public abstract class Resources {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idResource;
 
-    private String nomResource;
-    private ResourcesType resourceType;
+    private String nom;
+    private ResourcesType type;
 
 
 }

@@ -7,8 +7,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "admin")
-@AllArgsConstructor
-@NoArgsConstructor
 public class Admin extends Personne {
 
 }
