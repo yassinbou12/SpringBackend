@@ -1,17 +1,12 @@
 package com.pfe.projetpfe.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import java.util.Collection;
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @MappedSuperclass
 public abstract class Personne {
 
@@ -23,8 +18,9 @@ public abstract class Personne {
     private String email;
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<Role> roles=new ArrayList<>();
+    @OneToOne(cascade=CascadeType.ALL,fetch = FetchType.EAGER)
+    private AppRole role;
+
 
 
 

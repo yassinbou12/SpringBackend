@@ -1,5 +1,5 @@
 package com.pfe.projetpfe.entity;
 
-public enum PDFType {
+public enum ResourcesType {
     TD, TP, COURSE, CORRECTION, EXAM;
 }

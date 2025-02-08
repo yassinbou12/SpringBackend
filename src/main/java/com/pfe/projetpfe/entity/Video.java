@@ -1,4 +1,12 @@
 package com.pfe.projetpfe.entity;
 
-public class Video {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Video extends Resources{
+    private String lien;
 }

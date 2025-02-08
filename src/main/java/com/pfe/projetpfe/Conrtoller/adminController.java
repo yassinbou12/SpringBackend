@@ -1,35 +1,44 @@
 package com.pfe.projetpfe.Conrtoller;
 
-import com.pfe.projetpfe.Doa.ProfesseurService;
-import com.pfe.projetpfe.Dto.UserDto;
-import com.pfe.projetpfe.entity.Admin;
+
 import com.pfe.projetpfe.entity.Professeur;
-import com.pfe.projetpfe.repository.AdminRepository;
 import com.pfe.projetpfe.repository.ProfesseurRepository;
-import com.pfe.projetpfe.service.ProfService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.pfe.projetpfe.service.ProfServiceImp;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-@Controller()
+
+@Controller("/api/admin")
+@RequiredArgsConstructor
 public class adminController {
-    @Autowired
-    private AdminRepository adminRepository;
-    @Autowired
+
+    private ProfServiceImp profService;
     private ProfesseurRepository professeurRepository;
 
-    @Autowired
-    Professeur professeur;
 
 
-    @RequestMapping(path = "/admin/addProfsseur")
-    public ResponseEntity<Professeur> AddProfesseur(@RequestBody Professeur professeur) {
-        profService.encryptPassword(userDto);
+    @RequestMapping(path = "/addNewProfsseur")
+    public ResponseEntity<?> AddNewProfesseur(@RequestBody Professeur professeur) {
+        if(professeurRepository.findByEmail(professeur.getEmail()) != null){
+            return ResponseEntity.badRequest().body(professeur.getEmail()+"deja exist");
+        }
+        Professeur newProfesseur = profService.encryptPassword(professeur);
 
-        professeurRepository.save(userDto);
+
+        professeurRepository.save(newProfesseur);
+
+        Professeur professeurAjouter = new Professeur();
+        professeurAjouter.setId(newProfesseur.getId());
+        professeurAjouter.setNom(newProfesseur.getNom());
+        professeurAjouter.setPrenom(professeur.getPrenom());
+        professeurAjouter.setEmail(newProfesseur.getEmail());
+
+        return ResponseEntity.ok().body(professeurAjouter);
+
+
     }
 
 }
