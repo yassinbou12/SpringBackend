@@ -3,7 +3,7 @@ package com.pfe.projetpfe.service;
 import com.pfe.projetpfe.entity.Professeur;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-public class ProfServiceImp implements com.projetpfe.service.ProfService {
+public class ProfServiceImp implements com.pfe.projetpfe.service.ProfService {
     @Override
         public Professeur encryptPassword(Professeur user) {
             String pwd = user.getPassword();
