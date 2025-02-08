@@ -16,12 +16,13 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/", "/home").permitAll()  // Adjust the paths as needed
+ // URL to process login
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/home","/api/students/*").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(login -> login
-                        .loginPage("/login")              // Custom login page
-                        .loginProcessingUrl("/perform_login")  // URL to process login
+                        .loginPage("/login")
+
                         .permitAll())
                 .logout(logout -> logout
                         .permitAll());

@@ -1,21 +1,12 @@
 package com.pfe.projetpfe.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Lob;
+import lombok.Data;
 
 @Entity
-@Getter
-@Setter
-public class Fichier {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String nomFichier;
-    private PDFType typeFichier;
-
+@Data
+public class Fichier extends Resources{
     @Lob
     private byte[] data;
 }
