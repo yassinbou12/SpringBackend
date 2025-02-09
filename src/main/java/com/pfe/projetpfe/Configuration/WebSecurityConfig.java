@@ -15,17 +15,20 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/home","/api/students/*").permitAll()
+                        .requestMatchers("/", "/home", "/api/students/*").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(login -> login
                         .loginPage("/login")
                         .permitAll())
                 .logout(logout -> logout
+                        .logoutSuccessUrl("/login")  // Redirection après déconnexion
                         .permitAll());
 
         return http.build();
     }
+
 }
 
