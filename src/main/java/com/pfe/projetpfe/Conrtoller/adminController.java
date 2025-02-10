@@ -41,15 +41,13 @@ public class adminController {
 
         AppRole role= roleRepository.findByroleName(TypeRole.PROFESSEUR);
         newProfesseur.setRole(role);
+        newProfesseur.setFirstPassword(true);
         professeurRepository.save(newProfesseur);
 
-        Professeur professeurAjouter = new Professeur();
-        professeurAjouter.setId(newProfesseur.getId());
-        professeurAjouter.setNom(newProfesseur.getNom());
-        professeurAjouter.setPrenom(professeur.getPrenom());
-        professeurAjouter.setEmail(newProfesseur.getEmail());
+        ProfDto profDto =profService.getProfByName(newProfesseur.getNom());
 
-        return ResponseEntity.ok().body(professeurAjouter);
+
+        return ResponseEntity.ok().body(profDto);
 
     }
     @PutMapping(path = "/UpdateProfesseur")

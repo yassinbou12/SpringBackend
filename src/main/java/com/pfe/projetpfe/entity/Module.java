@@ -3,6 +3,9 @@ package com.pfe.projetpfe.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Table(name = "module")
 @Entity
 @Data
@@ -14,8 +17,8 @@ public class Module {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="moduleId")
     private Long moduleId;
-
     private String moduleName;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "filiere_id")

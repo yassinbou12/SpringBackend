@@ -19,9 +19,7 @@ public class Filiere {
 
     private String nomFiliere;
 
-    private String annneeFiliere;
-
-    private String semestreFiliere;
+    private String semestreFiliere;// to check
 
     @OneToMany(mappedBy = "filiere", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Module> moduleList;

@@ -14,10 +14,8 @@ import java.util.Set;
 @AllArgsConstructor
 
 public class Professeur extends Personne {
-
+    boolean isFirstPassword;
     @OneToMany(mappedBy = "professeur")
     private Collection<Module> modules;
-
-
 
 }
