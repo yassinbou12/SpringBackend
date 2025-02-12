@@ -9,9 +9,7 @@ import com.pfe.projetpfe.repository.ProfesseurRepository;
 import com.pfe.projetpfe.repository.RoleRepository;
 import com.pfe.projetpfe.service.AdminServiceImp;
 import com.pfe.projetpfe.service.AdminService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -24,64 +22,40 @@ import java.util.Optional;
 public class adminController {
 
     private final RoleRepository roleRepository;
+    private final AdminServiceImp adminServiceImp;
     private AdminService AdminService;
     private ProfesseurRepository professeurRepository;
     private AdminRepository adminRepository;
     private FiliereRepository filiereRepository;
 
-    public adminController(RoleRepository roleRepository, AdminService adminService, ProfesseurRepository professeurRepository, AdminRepository adminRepository, FiliereRepository filiereRepository) {
+    public adminController(RoleRepository roleRepository, AdminService adminService, ProfesseurRepository professeurRepository, AdminRepository adminRepository, FiliereRepository filiereRepository, AdminServiceImp adminServiceImp) {
         this.roleRepository = roleRepository;
         AdminService = adminService;
         this.professeurRepository = professeurRepository;
         this.adminRepository = adminRepository;
         this.filiereRepository = filiereRepository;
+        this.adminServiceImp = adminServiceImp;
     }
-
-    @PostMapping(path = "/addNewProfesseur")
+    //Gestion des professeurs
+    @PostMapping(path = "/AddNewProfesseur")
     public ResponseEntity<?> AddNewProfesseur(@RequestBody RegistrDto professeurRegistrDto) {
-        Optional<Professeur> professeurOptional=professeurRepository.findByEmail(professeurRegistrDto.getEmail());
-        if( professeurOptional.isPresent() ) {
-            return ResponseEntity.badRequest().body(professeurRegistrDto.getEmail()+"deja exist");
+        ProfDto profDto= adminServiceImp.addNewProf(professeurRegistrDto);
+        try{
+            return ResponseEntity.ok().body(profDto);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        //recuperer les info de register
-        Professeur professeur = new Professeur();
-        professeur.setNom(professeurRegistrDto.getNom());
-        professeur.setPrenom(professeurRegistrDto.getPrenom());
-        professeur.setEmail(professeurRegistrDto.getEmail());
-        //hashPassword
-        professeur.setPassword(AdminService.encryptPassword(professeurRegistrDto.getPassword()));
-        //ajouter le role
-        AppRole role= roleRepository.findByroleName(TypeRole.PROFESSEUR);
-        professeur.setRole(role);
-        //first password true
-        professeur.setFirstPassword(true);
-        //save
-        professeurRepository.save(professeur);
-
-        ProfDto profDto =AdminService.getProfByEmail(professeur.getEmail());
-
-
-        return ResponseEntity.ok().body(profDto);
-
     }
+
     @PutMapping(path = "/UpdateProfesseur")
     public ResponseEntity<?> updateProfesseur(@RequestBody Professeur professeur) throws Exception {
-        Optional<Professeur> existingProfesseur = professeurRepository.findById(professeur.getId());
-        if (!existingProfesseur.isPresent()) {
-            throw new Exception("Professeur with ID: " + professeur.getId()+" not found ");
+
+        ProfDto profDto= adminServiceImp.updateProf(professeur);
+        try {
+            return ResponseEntity.ok().body(profDto);
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        // Update logic
-        Professeur updatedProfesseur = existingProfesseur.get();
-        updatedProfesseur.setNom(professeur.getNom());
-        updatedProfesseur.setPrenom(professeur.getPrenom());
-        updatedProfesseur.setEmail(professeur.getEmail());
-
-        Professeur prof = professeurRepository.save(updatedProfesseur);
-
-        ProfDto profDto =AdminService.getProfByEmail(prof.getEmail());
-        
-        return ResponseEntity.ok().body(profDto );
     }
 
     @DeleteMapping(path = "DeleteProfesseur/{id}")
@@ -97,12 +71,10 @@ public class adminController {
     @GetMapping(path = "/ListProfesseurs")
     public ResponseEntity<?> ListProfesseurs() {
         List<ProfDto> professeursDto = AdminService.getAllProfs();
-
         if (professeursDto.isEmpty()) {
             // Retourner une réponse avec un code 400 si la liste est vide
             return ResponseEntity.badRequest().body("Aucun professeur trouvé");
         }
-
         return ResponseEntity.ok(professeursDto);
     }
 
@@ -114,7 +86,8 @@ public class adminController {
         }
         return ResponseEntity.ok().body(professeur);
     }
-    
+
+    //Gestion de profil admin
     @PutMapping(path = "/ModifierProfil")
     public ResponseEntity<?> ModifierProfil(@RequestBody Admin admin) throws Exception {
         Optional<Admin> adminRepo= adminRepository.findById(admin.getId());
@@ -126,18 +99,15 @@ public class adminController {
         AdminDto adminDto =AdminService.getAdminById(adminUpdate.getId());
         return ResponseEntity.ok().body(adminDto);
     }
-
+    //Gestion des filieres
     @PostMapping(path="/AddNewFiliere")
     public ResponseEntity<?> addNewFiliere(@RequestBody AddFiliereDto filiereDto) throws Exception {
-        Optional<Filiere> filiereOptional = filiereRepository.findByNomFiliere(filiereDto.getNom());
-        if (filiereOptional.isPresent()) {
-            return ResponseEntity.badRequest().body("Filiere existe ");
+        ReturnFiliereDto returnFiliereDto = adminServiceImp.addNewFiliere(filiereDto);
+        try {
+            return ResponseEntity.ok().body(returnFiliereDto);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        Filiere filiere =new Filiere();
-        filiere.setNomFiliere(filiereDto.getNom());
-        filiere= filiereRepository.save(filiere);
-        ReturnFiliereDto returnFiliereDto = new ReturnFiliereDto(filiere.getIdFiliere(), filiereDto.getNom());
-        return  ResponseEntity.ok().body(returnFiliereDto);
     }
 
     @DeleteMapping(path="/RemoveFiliere/{id}")
@@ -151,30 +121,21 @@ public class adminController {
     }
     @PutMapping(path="/ModifyFiliere")
     public ResponseEntity<?> modifyFiliere(@RequestBody ReturnFiliereDto filiere) throws Exception {
-        Optional<Filiere> filiereOptional = filiereRepository.findById(filiere.getId());
-        if (!filiereOptional.isPresent()) {
-            return ResponseEntity.badRequest().body("Filiere n'existe pas ");
+        ReturnFiliereDto returnFiliereDto = adminServiceImp.updateFiliere(filiere);
+        try {
+            return ResponseEntity.ok().body(returnFiliereDto);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        Filiere filiere1=(Filiere) filiereOptional.get();
-        filiere1.setNomFiliere(filiere.getNom());
-        filiere1= filiereRepository.save(filiere1);
-        ReturnFiliereDto returnFiliereDto=new ReturnFiliereDto(filiere1.getIdFiliere(), filiere1.getNomFiliere());
-
-        return ResponseEntity.ok().body(returnFiliereDto);
-
     }
     @GetMapping(path="/getAllFiliere")
     public ResponseEntity<?> getAllFiliere() throws Exception {
-        List<Filiere> filiereRepository1 = filiereRepository.findAll();
-        if (filiereRepository1.isEmpty()) {
-            return ResponseEntity.badRequest().body("la liste des Filiere est vide ");
+        List<ReturnFiliereDto> filiereList = adminServiceImp.getAllFilieres();
+        try {
+            return ResponseEntity.ok().body(filiereList);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        List<ReturnFiliereDto> returnFiliereDto=new ArrayList<>();
-        for (Filiere filiere : filiereRepository1) {
-            ReturnFiliereDto returnFiliereDto1=new ReturnFiliereDto(filiere.getIdFiliere(), filiere.getNomFiliere());
-            returnFiliereDto.add(returnFiliereDto1);
-        }
-        return ResponseEntity.ok().body(returnFiliereDto);
     }
 
 

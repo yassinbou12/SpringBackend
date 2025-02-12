@@ -40,26 +40,12 @@ public class ProfController {
 
     @PostMapping(path="/AddNewModule")
     public ResponseEntity<?> AddNewModule(@RequestBody ModuleAjouterDto moduleAjouterDto) throws Exception{
-        Optional<Module> moduleRepository =moduleRepositorie.findByModuleName(moduleAjouterDto.getName());
-        if(moduleRepository.isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Module already exists");
+        ReturnModuleDto returnModuleDto =professeurService.addModule(moduleAjouterDto);
+        try {
+            return ResponseEntity.ok(returnModuleDto);
+        }catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        Optional<Filiere> filiere=filiereRepository.findByNomFiliere(moduleAjouterDto.getFiliereName());
-
-        if(!filiere.isPresent()) {
-            return ResponseEntity.badRequest().body("Filiere n'existe pas");
-        }
-        Optional<Professeur> professeur=professeurRepository.findById(moduleAjouterDto.getIdProfesseur());
-        Module module=new Module();
-        module.setModuleName(moduleAjouterDto.getName());
-        module.setSemestre(moduleAjouterDto.getSemestre());
-        module.setFiliere(filiere.get());
-        module.setProfesseur(professeur.get());
-
-        Module savedModule=moduleRepositorie.save(module);
-
-        ReturnModuleDto returnModuleDto=new ReturnModuleDto(savedModule.getModuleId(),savedModule.getModuleName(),savedModule.getSemestre(),savedModule.getFiliere().getNomFiliere());
-        return ResponseEntity.ok(returnModuleDto);
     }
 
     @DeleteMapping(path="/DeleteModule/{id}")
@@ -73,29 +59,16 @@ public class ProfController {
     }
     @PutMapping(path="/ModifyModule")
     public ResponseEntity<?> ModifyModule(@RequestBody ReturnModuleDto returnModuleDto) throws Exception{
-        Optional<Module> module =moduleRepositorie.findById(returnModuleDto.getId());
-        if(!module.isPresent()) {
-            return ResponseEntity.notFound().build();
+        ReturnModuleDto returnModuleDto1 =professeurService.updateModule(returnModuleDto);
+        try {
+            return ResponseEntity.ok(returnModuleDto1);
+        }catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        Optional<Filiere> filiere=filiereRepository.findByNomFiliere(returnModuleDto.getFiliereName());
-        if(!filiere.isPresent()) {
-            return ResponseEntity.badRequest().body("Filiere n'existe pas");
-        }
-
-        Module updateMudole=module.get();
-        updateMudole.setModuleName(returnModuleDto.getName());
-        updateMudole.setSemestre(returnModuleDto.getSemestre());
-        updateMudole.setFiliere(filiere.get());
-        moduleRepositorie.save(updateMudole);
-
-        ReturnModuleDto moduleDto=new ReturnModuleDto(updateMudole.getModuleId(),updateMudole.getModuleName(),updateMudole.getSemestre(),updateMudole.getFiliere().getNomFiliere());
-
-        return ResponseEntity.ok().body(moduleDto);
     }
-    @GetMapping(path="/getAllModule/{id}")
+    @GetMapping(path="/getAllModuleByProfId/{id}")
     public ResponseEntity<?> getAllModule(@PathVariable Long id) throws Exception{
-        List<ReturnModuleDto> returnModuleDtos=professeurService.findByProfesseurId(id);
+        List<ReturnModuleDto> returnModuleDtos=professeurService.findModuleByProfesseurId(id);
         if(!returnModuleDtos.isEmpty()) {
             return ResponseEntity.ok(returnModuleDtos);
         }
