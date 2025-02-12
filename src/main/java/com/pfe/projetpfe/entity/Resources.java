@@ -1,23 +1,26 @@
 package com.pfe.projetpfe.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@MappedSuperclass
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
-public abstract class Resources {
+@Data
+public class Resources {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idResource;
     private String nom;
     private ResourcesType type;
+    private DataType dataType;
+    @Lob
+    private byte[] data;
+    private String lien;
+    @ManyToOne
+    @JoinColumn(name="moduleId")
+    private Module module;
 
 
 

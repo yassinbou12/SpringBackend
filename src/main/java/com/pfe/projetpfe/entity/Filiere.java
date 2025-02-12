@@ -1,5 +1,6 @@
 package com.pfe.projetpfe.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,8 +20,7 @@ public class Filiere {
 
     private String nomFiliere;
 
-    private String semestreFiliere;// to check
-
     @OneToMany(mappedBy = "filiere", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+
     private List<Module> moduleList;
 }

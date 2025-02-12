@@ -18,7 +18,7 @@ public class Module {
     @Column(name="moduleId")
     private Long moduleId;
     private String moduleName;
-
+    private String semestre;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "filiere_id")
@@ -28,4 +28,7 @@ public class Module {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "professeur_id", nullable = false) // la clé étrangère dans la table Module
     private Professeur professeur;
+
+    @OneToMany(mappedBy = "module", fetch = FetchType.LAZY)
+    private List<Resources> listResources =new ArrayList<>();
 }
