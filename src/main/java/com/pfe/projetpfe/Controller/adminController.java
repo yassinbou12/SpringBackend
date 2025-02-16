@@ -6,30 +6,29 @@ import com.pfe.projetpfe.entity.*;
 import com.pfe.projetpfe.repository.AdminRepository;
 import com.pfe.projetpfe.repository.FiliereRepository;
 import com.pfe.projetpfe.repository.ProfesseurRepository;
-import com.pfe.projetpfe.repository.RoleRepository;
 import com.pfe.projetpfe.service.AdminServiceImp;
 import com.pfe.projetpfe.service.AdminService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 
 @RestController
 @RequestMapping("/api/admin")
+@PreAuthorize("hasRole('ADMIN')")
 public class adminController {
 
-    private final RoleRepository roleRepository;
+
     private final AdminServiceImp adminServiceImp;
     private AdminService AdminService;
     private ProfesseurRepository professeurRepository;
     private AdminRepository adminRepository;
     private FiliereRepository filiereRepository;
 
-    public adminController(RoleRepository roleRepository, AdminService adminService, ProfesseurRepository professeurRepository, AdminRepository adminRepository, FiliereRepository filiereRepository, AdminServiceImp adminServiceImp) {
-        this.roleRepository = roleRepository;
+    public adminController(AdminService adminService, ProfesseurRepository professeurRepository, AdminRepository adminRepository, FiliereRepository filiereRepository, AdminServiceImp adminServiceImp) {;
         AdminService = adminService;
         this.professeurRepository = professeurRepository;
         this.adminRepository = adminRepository;

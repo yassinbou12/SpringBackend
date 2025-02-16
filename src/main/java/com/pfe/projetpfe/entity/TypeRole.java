@@ -1,6 +1,6 @@
 package com.pfe.projetpfe.entity;
 
 public enum TypeRole {
-    ADMIN,
-    PROFESSEUR;
+    ROLE_ADMIN,
+    ROLE_PROFESSEUR,
 }

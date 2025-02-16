@@ -15,15 +15,8 @@ public abstract class Personne {
     private Long id;
     private String nom;
     private String prenom;
+    @Column(unique = true)
     private String email;
     private String password;
-
-    @OneToOne(cascade=CascadeType.ALL,fetch = FetchType.EAGER)
-    private AppRole role;
-
-
-
-
-
 
 }

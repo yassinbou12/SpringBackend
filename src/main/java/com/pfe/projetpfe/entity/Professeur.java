@@ -14,7 +14,8 @@ import java.util.Set;
 @AllArgsConstructor
 
 public class Professeur extends Personne {
-    boolean isFirstPassword;
+    @Enumerated(EnumType.STRING)
+    private TypeRole role=TypeRole.ROLE_PROFESSEUR;
     @OneToMany(mappedBy = "professeur")
     private Collection<Module> modules;
 

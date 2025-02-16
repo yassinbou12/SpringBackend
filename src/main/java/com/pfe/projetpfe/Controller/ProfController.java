@@ -13,6 +13,7 @@ import com.pfe.projetpfe.service.ProfesseurService;
 import jakarta.el.PropertyNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import  com.pfe.projetpfe.entity.Module;
@@ -22,6 +23,7 @@ import java.util.Optional;
 
 @RestController()
 @RequestMapping("/api/professeur")
+@PreAuthorize("hasRole('PROFESSEUR')")
 
 public class ProfController {
     ProfesseurRepository professeurRepository;

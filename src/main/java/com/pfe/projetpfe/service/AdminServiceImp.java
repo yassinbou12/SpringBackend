@@ -5,9 +5,6 @@ import com.pfe.projetpfe.entity.*;
 import com.pfe.projetpfe.repository.AdminRepository;
 import com.pfe.projetpfe.repository.FiliereRepository;
 import com.pfe.projetpfe.repository.ProfesseurRepository;
-import com.pfe.projetpfe.repository.RoleRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +16,11 @@ public class AdminServiceImp implements AdminService {
 
     ProfesseurRepository professeurRepository;
     AdminRepository adminRepository;
-    RoleRepository roleRepository;
     FiliereRepository filiereRepository;
 
-    public AdminServiceImp(ProfesseurRepository professeurRepository, AdminRepository adminRepository, RoleRepository roleRepository,FiliereRepository filiereRepository) {
+    public AdminServiceImp(ProfesseurRepository professeurRepository, AdminRepository adminRepository,FiliereRepository filiereRepository) {
         this.professeurRepository = professeurRepository;
         this.adminRepository = adminRepository;
-        this.roleRepository = roleRepository;
         this.filiereRepository = filiereRepository;
     }
 
@@ -84,11 +79,7 @@ public class AdminServiceImp implements AdminService {
         professeur.setEmail(professeurRegistrDto.getEmail());
         //hashPassword
         professeur.setPassword(encryptPassword(professeurRegistrDto.getPassword()));
-        //ajouter le role
-        AppRole role= roleRepository.findByroleName(TypeRole.PROFESSEUR);
-        professeur.setRole(role);
-        //first password true
-        professeur.setFirstPassword(true);
+
         //save
         professeurRepository.save(professeur);
 
