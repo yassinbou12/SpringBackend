@@ -1,17 +1,14 @@
 package com.pfe.projetpfe.Controller;
 
 
-import com.pfe.projetpfe.Dto.ModuleAjouterDto;
-import com.pfe.projetpfe.Dto.ReturnModuleDto;
-import com.pfe.projetpfe.entity.Filiere;
-import com.pfe.projetpfe.entity.Professeur;
+import com.pfe.projetpfe.Dto.*;
 import com.pfe.projetpfe.repository.FiliereRepository;
 import com.pfe.projetpfe.repository.ModuleRepositorie;
 import com.pfe.projetpfe.repository.ProfesseurRepository;
 import com.pfe.projetpfe.repository.ResourcesRepository;
+import com.pfe.projetpfe.service.AdminService;
 import com.pfe.projetpfe.service.ProfesseurService;
-import jakarta.el.PropertyNotFoundException;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -31,17 +28,29 @@ public class ProfController {
     ModuleRepositorie moduleRepositorie;
     ResourcesRepository resourcesRepository;
     ProfesseurService professeurService;
+    AdminService adminService;
 
-    public ProfController(ProfesseurRepository professeurRepository, FiliereRepository filiereRepository, ModuleRepositorie moduleRepositorie, ResourcesRepository resourcesRepository, ProfesseurService professeurService) {
+    public ProfController(ProfesseurRepository professeurRepository, FiliereRepository filiereRepository, ModuleRepositorie moduleRepositorie, ResourcesRepository resourcesRepository, ProfesseurService professeurService,AdminService adminService) {
         this.professeurRepository = professeurRepository;
         this.filiereRepository = filiereRepository;
         this.moduleRepositorie = moduleRepositorie;
         this.resourcesRepository = resourcesRepository;
         this.professeurService = professeurService;
+        this.adminService = adminService;
     }
 
+    @GetMapping(path="/getAllFiliere")
+    public ResponseEntity<?> getAllFiliere() throws Exception {
+        List<ReturnFiliereDto> filiereList = adminService.getAllFilieres();
+        try {
+            return ResponseEntity.ok().body(filiereList);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    //Gestion des modules
     @PostMapping(path="/AddNewModule")
-    public ResponseEntity<?> AddNewModule(@RequestBody ModuleAjouterDto moduleAjouterDto) throws Exception{
+    public ResponseEntity<?> AddNewModule(@RequestBody AddModuleDto moduleAjouterDto) throws Exception{
         ReturnModuleDto returnModuleDto =professeurService.addModule(moduleAjouterDto);
         try {
             return ResponseEntity.ok(returnModuleDto);
@@ -76,4 +85,16 @@ public class ProfController {
         }
         return ResponseEntity.notFound().build();
     }
+    //Gestion des resources
+    @PostMapping(path="/addResource" ,consumes={MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> addResources(AddResourceDto ajouteResourceDto) throws Exception{
+        try {
+            ResourceReturnDto resourceReturnDto=professeurService.AddResources(ajouteResourceDto);
+            return ResponseEntity.ok(resourceReturnDto);
+        }catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+    }
+
 }

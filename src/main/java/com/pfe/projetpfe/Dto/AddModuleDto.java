@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class ModuleAjouterDto {
+public class AddModuleDto {
     Long idProfesseur;
     String name;
     String semestre;

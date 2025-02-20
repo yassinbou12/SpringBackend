@@ -1,14 +1,16 @@
 package com.pfe.projetpfe.service;
 
-import com.pfe.projetpfe.Dto.ModuleAjouterDto;
-import com.pfe.projetpfe.Dto.ReturnFiliereDto;
+import com.pfe.projetpfe.Dto.AddResourceDto;
+import com.pfe.projetpfe.Dto.AddModuleDto;
+import com.pfe.projetpfe.Dto.ResourceReturnDto;
 import com.pfe.projetpfe.Dto.ReturnModuleDto;
 import com.pfe.projetpfe.entity.Filiere;
 import com.pfe.projetpfe.entity.Professeur;
+import com.pfe.projetpfe.entity.Resources;
 import com.pfe.projetpfe.repository.FiliereRepository;
 import com.pfe.projetpfe.repository.ModuleRepositorie;
 import com.pfe.projetpfe.repository.ProfesseurRepository;
-import org.springframework.http.ResponseEntity;
+import com.pfe.projetpfe.repository.ResourcesRepository;
 import org.springframework.stereotype.Service;
 
 import com.pfe.projetpfe.entity.Module;
@@ -22,11 +24,14 @@ public class ProfesseurServiceImp implements ProfesseurService {
     ModuleRepositorie moduleRepositorie;
     FiliereRepository filiereRepository;
     ProfesseurRepository professeurRepository;
+    ResourcesRepository resourcesRepository;
 
-    public ProfesseurServiceImp(ModuleRepositorie moduleRepositorie, FiliereRepository filiereRepository,ProfesseurRepository professeurRepository) {
+
+    public ProfesseurServiceImp(ModuleRepositorie moduleRepositorie, FiliereRepository filiereRepository,ProfesseurRepository professeurRepository,ResourcesRepository resourcesRepository) {
         this.moduleRepositorie = moduleRepositorie;
         this.filiereRepository = filiereRepository;
         this.professeurRepository = professeurRepository;
+        this.resourcesRepository = resourcesRepository;
     }
 
     @Override
@@ -45,7 +50,7 @@ public class ProfesseurServiceImp implements ProfesseurService {
     }
 
     @Override
-    public ReturnModuleDto addModule(ModuleAjouterDto moduleAjouterDto) {
+    public ReturnModuleDto addModule(AddModuleDto moduleAjouterDto) {
         Optional<Filiere> filiere=filiereRepository.findByNomFiliere(moduleAjouterDto.getFiliereName());
 
         if(!filiere.isPresent()) {
@@ -87,5 +92,37 @@ public class ProfesseurServiceImp implements ProfesseurService {
 
         return moduleDto;
     }
+    //Gestion Resources
+    @Override
+    public ResourceReturnDto AddResources(AddResourceDto ajouteResourceDto) throws Exception{
+       Optional<Module> module=moduleRepositorie.findById(ajouteResourceDto.getModuleId());
+       if(!module.isPresent()) {
+           new RuntimeException("Module non trouvable");
+       }
+       Resources resources=new Resources();
+       resources.setNom(ajouteResourceDto.getNom());
+       resources.setData(ajouteResourceDto.getData().getBytes());
+       resources.setLien(ajouteResourceDto.getLien());
+       resources.setType(ajouteResourceDto.getType());
+       resources.setDataType(ajouteResourceDto.getDataType());
+       resources.setModule(module.get());
+
+       Resources resources1=resourcesRepository.save(resources);
+
+        ResourceReturnDto resourceReturnDto=new ResourceReturnDto();
+        resourceReturnDto.setId(resources1.getIdResource());
+        resourceReturnDto.setNom(resources1.getNom());
+        resourceReturnDto.setData(resources1.getData());
+        resourceReturnDto.setLien(resources1.getLien());
+        resourceReturnDto.setType(resources1.getType());
+        resourceReturnDto.setDataType(resources1.getDataType());
+        resourceReturnDto.setModuleName(resources1.getModule().getModuleName());
+        String filiereName = resources1.getModule().getFiliere().getNomFiliere();
+        resourceReturnDto.setFiliereName(filiereName);
+
+
+       return resourceReturnDto;
+     }
+
 
 }

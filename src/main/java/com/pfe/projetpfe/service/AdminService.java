@@ -2,6 +2,7 @@ package com.pfe.projetpfe.service;
 
 import com.pfe.projetpfe.Dto.*;
 import com.pfe.projetpfe.entity.Professeur;
+import com.pfe.projetpfe.entity.Resources;
 
 import java.util.List;
 

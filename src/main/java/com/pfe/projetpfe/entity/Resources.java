@@ -13,7 +13,9 @@ public class Resources {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idResource;
     private String nom;
+    @Enumerated(EnumType.STRING)
     private ResourcesType type;
+    @Enumerated(EnumType.STRING)
     private DataType dataType;
     @Lob
     private byte[] data;
