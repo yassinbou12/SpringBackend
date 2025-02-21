@@ -1,18 +1,18 @@
 package com.pfe.projetpfe.service;
 
-import com.pfe.projetpfe.Dto.AddResourceDto;
-import com.pfe.projetpfe.Dto.AddModuleDto;
-import com.pfe.projetpfe.Dto.ResourceReturnDto;
-import com.pfe.projetpfe.Dto.ReturnModuleDto;
+import com.pfe.projetpfe.Dto.*;
 
 
 import java.util.List;
 
 public interface ProfesseurService {
+    //gestion mudole
     List<ReturnModuleDto> findModuleByProfesseurId(Long professeurId);
     ReturnModuleDto addModule(AddModuleDto ajouterDto);
     ReturnModuleDto updateModule(ReturnModuleDto returnModuleDto);
 
-    ResourceReturnDto AddResources(AddResourceDto ajouteResourceDto) throws Exception;
+    //gestion resources
+    ResourceReturnDto addResources(AddResourceDto ajouteResourceDto) throws Exception;
+   ResourceReturnDto updateResources(UpdateResourceDto updateResourceDto ) throws Exception;
 }
 

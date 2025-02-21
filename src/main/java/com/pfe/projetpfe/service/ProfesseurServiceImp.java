@@ -1,9 +1,6 @@
 package com.pfe.projetpfe.service;
 
-import com.pfe.projetpfe.Dto.AddResourceDto;
-import com.pfe.projetpfe.Dto.AddModuleDto;
-import com.pfe.projetpfe.Dto.ResourceReturnDto;
-import com.pfe.projetpfe.Dto.ReturnModuleDto;
+import com.pfe.projetpfe.Dto.*;
 import com.pfe.projetpfe.entity.Filiere;
 import com.pfe.projetpfe.entity.Professeur;
 import com.pfe.projetpfe.entity.Resources;
@@ -94,7 +91,7 @@ public class ProfesseurServiceImp implements ProfesseurService {
     }
     //Gestion Resources
     @Override
-    public ResourceReturnDto AddResources(AddResourceDto ajouteResourceDto) throws Exception{
+    public ResourceReturnDto addResources(AddResourceDto ajouteResourceDto) throws Exception{
        Optional<Module> module=moduleRepositorie.findById(ajouteResourceDto.getModuleId());
        if(!module.isPresent()) {
            new RuntimeException("Module non trouvable");
@@ -117,6 +114,7 @@ public class ProfesseurServiceImp implements ProfesseurService {
         resourceReturnDto.setType(resources1.getType());
         resourceReturnDto.setDataType(resources1.getDataType());
         resourceReturnDto.setModuleName(resources1.getModule().getModuleName());
+        resourceReturnDto.setModuleId(resources1.getModule().getModuleId());
         String filiereName = resources1.getModule().getFiliere().getNomFiliere();
         resourceReturnDto.setFiliereName(filiereName);
 
@@ -124,5 +122,48 @@ public class ProfesseurServiceImp implements ProfesseurService {
        return resourceReturnDto;
      }
 
+     @Override
+     public ResourceReturnDto updateResources(UpdateResourceDto updateResourceDto)  throws Exception{
+
+         //verifier si resource exist
+        Optional<Resources> resources=resourcesRepository.findById(updateResourceDto.getId());
+        if(!resources.isPresent()) {
+            new RuntimeException("Resource non trouvable");
+        }
+        //verifier si le module exist
+         Optional<Module> module=moduleRepositorie.findById(updateResourceDto.getModuleId());
+         if(!module.isPresent()) {
+             new RuntimeException("Module non trouvable");
+         }
+         //ici le resourece qui recuperer dans DB
+         Resources updateResources=resources.get();
+         //mettre a jour a ce Resources par les nouveaux donnes de requet
+
+         updateResources.setNom(updateResourceDto.getNom());
+         updateResources.setData(updateResourceDto.getData().getBytes());
+         updateResources.setLien(updateResourceDto.getLien());
+         updateResources.setType(updateResourceDto.getType());
+         updateResources.setDataType(updateResourceDto.getDataType());
+         updateResources.setModule(module.get());
+         System.out.println(updateResources.getDataType());
+         //valider la modification
+         Resources resources1=resourcesRepository.save(updateResources);
+
+         //preparer la reponse au client
+         ResourceReturnDto resourceReturnDto1=new ResourceReturnDto();
+         resourceReturnDto1.setId(resources1.getIdResource());
+         resourceReturnDto1.setNom(resources1.getNom());
+         resourceReturnDto1.setData(resources1.getData());
+         resourceReturnDto1.setLien(resources1.getLien());
+         resourceReturnDto1.setType(resources1.getType());
+         resourceReturnDto1.setDataType(resources1.getDataType());
+         resourceReturnDto1.setModuleName(resources1.getModule().getModuleName());
+         resourceReturnDto1.setModuleId(resources1.getModule().getModuleId());
+         String filiereName = resources1.getModule().getFiliere().getNomFiliere();
+         resourceReturnDto1.setFiliereName(filiereName);
+         //return response(Resources)
+         return resourceReturnDto1;
+
+     }
 
 }

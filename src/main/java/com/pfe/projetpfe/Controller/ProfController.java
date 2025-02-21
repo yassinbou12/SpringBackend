@@ -40,7 +40,7 @@ public class ProfController {
     }
 
     @GetMapping(path="/getAllFiliere")
-    public ResponseEntity<?> getAllFiliere() throws Exception {
+    public ResponseEntity<?> getAllFiliere() {
         List<ReturnFiliereDto> filiereList = adminService.getAllFilieres();
         try {
             return ResponseEntity.ok().body(filiereList);
@@ -50,7 +50,7 @@ public class ProfController {
     }
     //Gestion des modules
     @PostMapping(path="/AddNewModule")
-    public ResponseEntity<?> AddNewModule(@RequestBody AddModuleDto moduleAjouterDto) throws Exception{
+    public ResponseEntity<?> AddNewModule(@RequestBody AddModuleDto moduleAjouterDto){
         ReturnModuleDto returnModuleDto =professeurService.addModule(moduleAjouterDto);
         try {
             return ResponseEntity.ok(returnModuleDto);
@@ -69,7 +69,7 @@ public class ProfController {
         return ResponseEntity.ok().body("Module deleted successfully");
     }
     @PutMapping(path="/ModifyModule")
-    public ResponseEntity<?> ModifyModule(@RequestBody ReturnModuleDto returnModuleDto) throws Exception{
+    public ResponseEntity<?> ModifyModule(@RequestBody ReturnModuleDto returnModuleDto){
         ReturnModuleDto returnModuleDto1 =professeurService.updateModule(returnModuleDto);
         try {
             return ResponseEntity.ok(returnModuleDto1);
@@ -87,14 +87,28 @@ public class ProfController {
     }
     //Gestion des resources
     @PostMapping(path="/addResource" ,consumes={MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<?> addResources(AddResourceDto ajouteResourceDto) throws Exception{
+    public ResponseEntity<?> addResources(@ModelAttribute AddResourceDto ajouteResourceDto){
+        System.out.println(ajouteResourceDto.getDataType());
+        System.out.println(ajouteResourceDto.getType());
+        System.out.println(ajouteResourceDto.getLien());
+
+        System.out.println(ajouteResourceDto.getModuleId());
+
         try {
-            ResourceReturnDto resourceReturnDto=professeurService.AddResources(ajouteResourceDto);
+            ResourceReturnDto resourceReturnDto=professeurService.addResources(ajouteResourceDto);
             return ResponseEntity.ok(resourceReturnDto);
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-
+    }
+    @PutMapping(path="/updateResource",consumes={MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> updateResource(@ModelAttribute  UpdateResourceDto updateResourceDto){
+        try {
+            ResourceReturnDto resourceReturnDto1=professeurService.updateResources(updateResourceDto);
+            return ResponseEntity.ok(resourceReturnDto1);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }

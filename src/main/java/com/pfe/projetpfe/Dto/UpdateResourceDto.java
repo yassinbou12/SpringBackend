@@ -9,18 +9,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class ResourceReturnDto {
+
+public class UpdateResourceDto {
     private Long id;
     private String nom;
     @Enumerated(EnumType.STRING)
     private ResourcesType type;
     @Enumerated(EnumType.STRING)
     private DataType dataType;
-    private byte[] data;
+    private MultipartFile data;
     private String lien;
     private String moduleName;
     private Long moduleId;
