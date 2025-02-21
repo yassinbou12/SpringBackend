@@ -38,7 +38,14 @@ public class ProfController {
         this.professeurService = professeurService;
         this.adminService = adminService;
     }
-
+    @GetMapping(path = "/GetProfesseur/{email}")
+    public ResponseEntity<?> ChercheProfesseur(@PathVariable String email) throws Exception {
+        ProfDto professeur =adminService.getProfByEmail(email);
+        if (professeur==null) {
+            throw new Exception("Professeur " +email+" n'exist pas");
+        }
+        return ResponseEntity.ok().body(professeur);
+    }
     @GetMapping(path="/getAllFiliere")
     public ResponseEntity<?> getAllFiliere() {
         List<ReturnFiliereDto> filiereList = adminService.getAllFilieres();
@@ -88,12 +95,6 @@ public class ProfController {
     //Gestion des resources
     @PostMapping(path="/addResource" ,consumes={MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> addResources(@ModelAttribute AddResourceDto ajouteResourceDto){
-        System.out.println(ajouteResourceDto.getDataType());
-        System.out.println(ajouteResourceDto.getType());
-        System.out.println(ajouteResourceDto.getLien());
-
-        System.out.println(ajouteResourceDto.getModuleId());
-
         try {
             ResourceReturnDto resourceReturnDto=professeurService.addResources(ajouteResourceDto);
             return ResponseEntity.ok(resourceReturnDto);

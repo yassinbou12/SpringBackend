@@ -24,20 +24,7 @@ public class AdminServiceImp implements AdminService {
         this.filiereRepository = filiereRepository;
     }
 
-    @Override
-    public ProfDto getProfByName(String name) {
-       Optional<Professeur> professeur=professeurRepository.findByNom(name);
-       if(!professeur.isPresent()){
-           return null;
-       }
-       ProfDto profDto = new ProfDto();
 
-       profDto.setId(professeur.get().getId());
-       profDto.setNom(professeur.get().getNom());
-       profDto.setPrenom(professeur.get().getPrenom());
-       profDto.setEmail(professeur.get().getEmail());
-       return profDto;
-    }
     @Override
     public ProfDto getProfByEmail(String email) {
         Optional<Professeur> professeur= professeurRepository.findByEmail(email);

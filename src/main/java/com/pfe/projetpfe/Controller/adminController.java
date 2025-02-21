@@ -23,13 +23,13 @@ public class adminController {
 
 
     private final AdminServiceImp adminServiceImp;
-    private AdminService AdminService;
+    private AdminService adminService;
     private ProfesseurRepository professeurRepository;
     private AdminRepository adminRepository;
     private FiliereRepository filiereRepository;
 
     public adminController(AdminService adminService, ProfesseurRepository professeurRepository, AdminRepository adminRepository, FiliereRepository filiereRepository, AdminServiceImp adminServiceImp) {;
-        AdminService = adminService;
+        adminService = adminService;
         this.professeurRepository = professeurRepository;
         this.adminRepository = adminRepository;
         this.filiereRepository = filiereRepository;
@@ -69,7 +69,7 @@ public class adminController {
 
     @GetMapping(path = "/ListProfesseurs")
     public ResponseEntity<?> ListProfesseurs() {
-        List<ProfDto> professeursDto = AdminService.getAllProfs();
+        List<ProfDto> professeursDto = adminService.getAllProfs();
         if (professeursDto.isEmpty()) {
             // Retourner une réponse avec un code 400 si la liste est vide
             return ResponseEntity.badRequest().body("Aucun professeur trouvé");
@@ -77,11 +77,11 @@ public class adminController {
         return ResponseEntity.ok(professeursDto);
     }
 
-    @GetMapping(path = "/GetProfesseur/{nom}")
-    public ResponseEntity<?> ChercheProfesseur(@PathVariable String nom) throws Exception {
-        ProfDto professeur =AdminService.getProfByName(nom);
+    @GetMapping(path = "/GetProfesseur/{email}")
+    public ResponseEntity<?> ChercheProfesseur(@PathVariable String email) throws Exception {
+        ProfDto professeur =adminService.getProfByEmail(email);
         if (professeur==null) {
-            throw new Exception("Professeur " +nom+" n'exist pas");
+            throw new Exception("Professeur " +email+" n'exist pas");
         }
         return ResponseEntity.ok().body(professeur);
     }
@@ -95,7 +95,7 @@ public class adminController {
         }
         Admin adminUpdate = adminRepository.save(admin);
 
-        AdminDto adminDto =AdminService.getAdminById(adminUpdate.getId());
+        AdminDto adminDto =adminService.getAdminById(adminUpdate.getId());
         return ResponseEntity.ok().body(adminDto);
     }
     //Gestion des filieres
