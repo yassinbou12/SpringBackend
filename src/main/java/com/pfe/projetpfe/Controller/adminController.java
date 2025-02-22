@@ -22,23 +22,22 @@ import java.util.Optional;
 public class adminController {
 
 
-    private final AdminServiceImp adminServiceImp;
+
     private AdminService adminService;
     private ProfesseurRepository professeurRepository;
     private AdminRepository adminRepository;
     private FiliereRepository filiereRepository;
 
-    public adminController(AdminService adminService, ProfesseurRepository professeurRepository, AdminRepository adminRepository, FiliereRepository filiereRepository, AdminServiceImp adminServiceImp) {;
-        adminService = adminService;
+    public adminController(AdminService adminService, ProfesseurRepository professeurRepository, AdminRepository adminRepository, FiliereRepository filiereRepository) {;
+        this.adminService = adminService;
         this.professeurRepository = professeurRepository;
         this.adminRepository = adminRepository;
         this.filiereRepository = filiereRepository;
-        this.adminServiceImp = adminServiceImp;
     }
     //Gestion des professeurs
     @PostMapping(path = "/AddNewProfesseur")
     public ResponseEntity<?> AddNewProfesseur(@RequestBody RegistrDto professeurRegistrDto) {
-        ProfDto profDto= adminServiceImp.addNewProf(professeurRegistrDto);
+        ProfDto profDto= adminService.addNewProf(professeurRegistrDto);
         try{
             return ResponseEntity.ok().body(profDto);
         }catch (Exception e){
@@ -49,7 +48,7 @@ public class adminController {
     @PutMapping(path = "/UpdateProfesseur")
     public ResponseEntity<?> updateProfesseur(@RequestBody Professeur professeur) throws Exception {
 
-        ProfDto profDto= adminServiceImp.updateProf(professeur);
+        ProfDto profDto= adminService.updateProf(professeur);
         try {
             return ResponseEntity.ok().body(profDto);
         } catch (Exception e){
@@ -87,6 +86,7 @@ public class adminController {
     }
 
     //Gestion de profil admin
+    //not working
     @PutMapping(path = "/ModifierProfil")
     public ResponseEntity<?> ModifierProfil(@RequestBody Admin admin) throws Exception {
         Optional<Admin> adminRepo= adminRepository.findById(admin.getId());
@@ -101,7 +101,7 @@ public class adminController {
     //Gestion des filieres
     @PostMapping(path="/AddNewFiliere")
     public ResponseEntity<?> addNewFiliere(@RequestBody AddFiliereDto filiereDto) throws Exception {
-        ReturnFiliereDto returnFiliereDto = adminServiceImp.addNewFiliere(filiereDto);
+        ReturnFiliereDto returnFiliereDto = adminService.addNewFiliere(filiereDto);
         try {
             return ResponseEntity.ok().body(returnFiliereDto);
         }catch (Exception e){
@@ -120,7 +120,7 @@ public class adminController {
     }
     @PutMapping(path="/ModifyFiliere")
     public ResponseEntity<?> modifyFiliere(@RequestBody ReturnFiliereDto filiere) throws Exception {
-        ReturnFiliereDto returnFiliereDto = adminServiceImp.updateFiliere(filiere);
+        ReturnFiliereDto returnFiliereDto = adminService.updateFiliere(filiere);
         try {
             return ResponseEntity.ok().body(returnFiliereDto);
         }catch (Exception e){
@@ -129,7 +129,7 @@ public class adminController {
     }
     @GetMapping(path="/getAllFiliere")
     public ResponseEntity<?> getAllFiliere() throws Exception {
-        List<ReturnFiliereDto> filiereList = adminServiceImp.getAllFilieres();
+        List<ReturnFiliereDto> filiereList = adminService.getAllFilieres();
         try {
             return ResponseEntity.ok().body(filiereList);
         }catch (Exception e){
