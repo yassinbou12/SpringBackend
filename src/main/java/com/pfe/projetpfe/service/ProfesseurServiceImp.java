@@ -267,8 +267,8 @@ public class ProfesseurServiceImp implements ProfesseurService {
      }
 
     @Override
-    public List<ResourceReturnDto> getAllResources() throws Exception {
-        List<Resources> resources=resourcesRepository.findAll();
+    public List<ResourceReturnDto> getAllResourcesByProfId(Long id) throws Exception {
+        List<Resources> resources=resourcesRepository.findAllByProfesseurId(id);
         if (resources.isEmpty()){
             new RuntimeException("aucune ressource trouver au moment");
         }

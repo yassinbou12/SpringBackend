@@ -120,10 +120,10 @@ public class ProfController {
             return ResponseEntity.badRequest().body("resource not found");
         }
     }
-    @GetMapping(path="/getAllResources")
-    public ResponseEntity<?> getAllResources() {
+    @GetMapping(path="/getAllResources/{id}")
+    public ResponseEntity<?> getAllResources(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok().body(professeurService.getAllResources());
+            return ResponseEntity.ok().body(professeurService.getAllResourcesByProfId(id));
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
