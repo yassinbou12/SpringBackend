@@ -20,5 +20,6 @@ public class AddResourceDto {
     private MultipartFile data;
     private String lien;
     private Long moduleId;
+    private Long professorId;
 
 }

@@ -1,6 +1,7 @@
 package com.pfe.projetpfe.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -19,6 +20,8 @@ public class Module {
     private Long moduleId;
     private String moduleName;
     private String semestre;
+    @Max(9000)
+    private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "filiere_id")

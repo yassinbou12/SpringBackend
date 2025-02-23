@@ -3,6 +3,7 @@ package com.pfe.projetpfe.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +18,10 @@ public class Professeur extends Personne {
     @Enumerated(EnumType.STRING)
     private TypeRole role=TypeRole.ROLE_PROFESSEUR;
     @OneToMany(mappedBy = "professeur")
-    private Collection<Module> modules;
+    private Collection<Module> modules=new ArrayList<>();
+    @OneToMany(mappedBy = "professeur")
+    private Collection<Resources> resources=new ArrayList<>();
+    @OneToMany(mappedBy = "professeur")
+    private Collection<Annonce> annonces=new ArrayList<>();
 
 }

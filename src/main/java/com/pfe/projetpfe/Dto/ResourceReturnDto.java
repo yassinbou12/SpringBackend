@@ -7,7 +7,8 @@ import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+
 
 
 @NoArgsConstructor
@@ -20,9 +21,9 @@ public class ResourceReturnDto {
     private ResourcesType type;
     @Enumerated(EnumType.STRING)
     private DataType dataType;
-    private byte[] data;
     private String lien;
     private String moduleName;
     private Long moduleId;
+    private Long professorId;
     private String filiereName;
 }

@@ -1,17 +1,21 @@
 package com.pfe.projetpfe.service;
 
 import com.pfe.projetpfe.Dto.*;
-import com.pfe.projetpfe.entity.Filiere;
-import com.pfe.projetpfe.entity.Professeur;
-import com.pfe.projetpfe.entity.Resources;
+import com.pfe.projetpfe.entity.*;
+import com.pfe.projetpfe.entity.Module;
 import com.pfe.projetpfe.repository.FiliereRepository;
 import com.pfe.projetpfe.repository.ModuleRepositorie;
 import com.pfe.projetpfe.repository.ProfesseurRepository;
 import com.pfe.projetpfe.repository.ResourcesRepository;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 
-import com.pfe.projetpfe.entity.Module;
-
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +49,9 @@ public class ProfesseurServiceImp implements ProfesseurService {
         }
         return moduleListDto;
     }
-
+    /*
+    Gestion des modules
+    */
     @Override
     public ReturnModuleDto addModule(AddModuleDto moduleAjouterDto) {
         Optional<Filiere> filiere=filiereRepository.findByNomFiliere(moduleAjouterDto.getFiliereName());
@@ -58,11 +64,12 @@ public class ProfesseurServiceImp implements ProfesseurService {
         module.setModuleName(moduleAjouterDto.getName());
         module.setSemestre(moduleAjouterDto.getSemestre());
         module.setFiliere(filiere.get());
+        module.setDescription(moduleAjouterDto.getDescription());
         module.setProfesseur(professeur.get());
 
         Module savedModule=moduleRepositorie.save(module);
 
-        ReturnModuleDto returnModuleDto=new ReturnModuleDto(savedModule.getModuleId(),savedModule.getModuleName(),savedModule.getSemestre(),savedModule.getFiliere().getNomFiliere());
+        ReturnModuleDto returnModuleDto=new ReturnModuleDto(savedModule.getModuleId(),savedModule.getModuleName(),savedModule.getSemestre(),savedModule.getFiliere().getNomFiliere(),savedModule.getDescription());
         return returnModuleDto;
     }
 
@@ -85,42 +92,93 @@ public class ProfesseurServiceImp implements ProfesseurService {
 
         updateMudole =moduleRepositorie.save(updateMudole);
 
-        ReturnModuleDto moduleDto=new ReturnModuleDto(updateMudole.getModuleId(),updateMudole.getModuleName(),updateMudole.getSemestre(),updateMudole.getFiliere().getNomFiliere());
+        ReturnModuleDto moduleDto=new ReturnModuleDto(updateMudole.getModuleId(),updateMudole.getModuleName(),updateMudole.getSemestre(),updateMudole.getFiliere().getNomFiliere(),updateMudole.getDescription());
 
         return moduleDto;
     }
-    //Gestion Resources
+    /*
+    Gestion Resources
+    */
     @Override
     public ResourceReturnDto addResources(AddResourceDto ajouteResourceDto) throws Exception{
+        //determiner ci le module laquelle appartinet ces Resources existe ou pas
        Optional<Module> module=moduleRepositorie.findById(ajouteResourceDto.getModuleId());
        if(!module.isPresent()) {
            new RuntimeException("Module non trouvable");
        }
-       Resources resources=new Resources();
-       resources.setNom(ajouteResourceDto.getNom());
-       resources.setData(ajouteResourceDto.getData().getBytes());
-       resources.setLien(ajouteResourceDto.getLien());
-       resources.setType(ajouteResourceDto.getType());
-       resources.setDataType(ajouteResourceDto.getDataType());
-       resources.setModule(module.get());
+       //determiner ci le Professeur qui ajouter ces Resources existe ou pas
+        Optional<Professeur> professeur=professeurRepository.findById(ajouteResourceDto.getProfessorId());
+       if(!professeur.isPresent()) {
+           new RuntimeException("Professeur non trouvable");
+       }
 
-       Resources resources1=resourcesRepository.save(resources);
+       //determiner le type de resources(soit Fichier(MultipartFile) soit un lien Vidoe)
+        DataType dataType=ajouteResourceDto.getDataType();
+       if (dataType.equals(DataType.VIDEO)){
+           //save Video
+           Resources resources=new Resources();
+           resources.setNom(ajouteResourceDto.getNom());
+           resources.setType(ajouteResourceDto.getType());
+           resources.setDataType(ajouteResourceDto.getDataType());
+           resources.setLien(ajouteResourceDto.getLien());
+           resources.setModule(module.get());
+           resources.setProfesseur(professeur.get());
+           Resources resources1=resourcesRepository.save(resources);
+            //retourner la vedio
+           ResourceReturnDto resourceReturnDto=new ResourceReturnDto();
+           resourceReturnDto.setId(resources1.getIdResource());
+           resourceReturnDto.setNom(resources1.getNom());
+           resourceReturnDto.setLien(resources1.getLien());
+           resourceReturnDto.setType(resources1.getType());
+           resourceReturnDto.setDataType(resources1.getDataType());
+           resourceReturnDto.setModuleName(resources1.getModule().getModuleName());
+           resourceReturnDto.setModuleId(resources1.getModule().getModuleId());
+           resourceReturnDto.setProfessorId(professeur.get().getId());
 
-        ResourceReturnDto resourceReturnDto=new ResourceReturnDto();
-        resourceReturnDto.setId(resources1.getIdResource());
-        resourceReturnDto.setNom(resources1.getNom());
-        resourceReturnDto.setData(resources1.getData());
-        resourceReturnDto.setLien(resources1.getLien());
-        resourceReturnDto.setType(resources1.getType());
-        resourceReturnDto.setDataType(resources1.getDataType());
-        resourceReturnDto.setModuleName(resources1.getModule().getModuleName());
-        resourceReturnDto.setModuleId(resources1.getModule().getModuleId());
-        String filiereName = resources1.getModule().getFiliere().getNomFiliere();
-        resourceReturnDto.setFiliereName(filiereName);
+           String filiereName = resources1.getModule().getFiliere().getNomFiliere();
+           resourceReturnDto.setFiliereName(filiereName);
+           return resourceReturnDto;
+       }else{
+           Path path = Paths.get("src/main/resources/static/fichiers/" + ajouteResourceDto.getData().getOriginalFilename());
+           // Assurez-vous que le répertoire existe
+           Files.createDirectories(path.getParent());
+           try {
+               Files.copy(ajouteResourceDto.getData().getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+               String filePath="/fichiers/"+ajouteResourceDto.getData().getOriginalFilename();
+
+               // Sauvegarder le chemin dans la base de données
+               Resources resources=new Resources();
+               resources.setNom(ajouteResourceDto.getNom());
+               resources.setType(ajouteResourceDto.getType());
+               resources.setDataType(ajouteResourceDto.getDataType());
+               resources.setLien(filePath);// chemin relatif
+               resources.setModule(module.get());
+               resources.setProfesseur(professeur.get());
+               Resources resources1=resourcesRepository.save(resources);
+
+               ResourceReturnDto resourceReturnDto=new ResourceReturnDto();
+               resourceReturnDto.setId(resources1.getIdResource());
+               resourceReturnDto.setNom(resources1.getNom());
 
 
-       return resourceReturnDto;
-     }
+               resourceReturnDto.setLien(resources1.getLien());
+
+               resourceReturnDto.setType(resources1.getType());
+               resourceReturnDto.setDataType(resources1.getDataType());
+               resourceReturnDto.setModuleName(resources1.getModule().getModuleName());
+               resourceReturnDto.setModuleId(resources1.getModule().getModuleId());
+               String filiereName = resources1.getModule().getFiliere().getNomFiliere();
+               resourceReturnDto.setFiliereName(filiereName);
+               resourceReturnDto.setProfessorId(resources1.getProfesseur().getId());
+               return resourceReturnDto;
+
+
+           }catch (IOException e){
+               e.printStackTrace();
+           }
+       }
+        return null;
+    }
 
      @Override
      public ResourceReturnDto updateResources(UpdateResourceDto updateResourceDto)  throws Exception{
@@ -135,34 +193,75 @@ public class ProfesseurServiceImp implements ProfesseurService {
          if(!module.isPresent()) {
              new RuntimeException("Module non trouvable");
          }
+         //determiner ci le Professeur qui ajouter ces Resources existe ou pas
+         Optional<Professeur> professeur=professeurRepository.findById(updateResourceDto.getProfessorId());
+         if(!professeur.isPresent()) {
+             new RuntimeException("Professeur non trouvable");
+         }
+
          //ici le resourece qui recuperer dans DB
          Resources updateResources=resources.get();
          //mettre a jour a ce Resources par les nouveaux donnes de requet
+          //check le type de nouvaux resources
+         DataType dataType=updateResourceDto.getDataType();
+       if (dataType.equals(DataType.VIDEO)){
+           //update Video
+           updateResources.setNom(updateResourceDto.getNom());
+           updateResources.setType(updateResourceDto.getType());
+           updateResources.setDataType(updateResourceDto.getDataType());
+           updateResources.setLien(updateResourceDto.getLien());
+           updateResources.setModule(module.get());
+           updateResources.setProfesseur(professeur.get());
+           Resources resources1=resourcesRepository.save(updateResources);
+            //retourner la vedio
+           ResourceReturnDto resourceReturnDto=new ResourceReturnDto();
+           resourceReturnDto.setId(resources1.getIdResource());
+           resourceReturnDto.setNom(resources1.getNom());
+           resourceReturnDto.setLien(resources1.getLien());
+           resourceReturnDto.setType(resources1.getType());
+           resourceReturnDto.setDataType(resources1.getDataType());
+           resourceReturnDto.setModuleName(resources1.getModule().getModuleName());
+           resourceReturnDto.setModuleId(resources1.getModule().getModuleId());
+           resourceReturnDto.setProfessorId(professeur.get().getId());
 
-         updateResources.setNom(updateResourceDto.getNom());
-         updateResources.setData(updateResourceDto.getData().getBytes());
-         updateResources.setLien(updateResourceDto.getLien());
-         updateResources.setType(updateResourceDto.getType());
-         updateResources.setDataType(updateResourceDto.getDataType());
-         updateResources.setModule(module.get());
-         System.out.println(updateResources.getDataType());
-         //valider la modification
-         Resources resources1=resourcesRepository.save(updateResources);
+           String filiereName = resources1.getModule().getFiliere().getNomFiliere();
+           resourceReturnDto.setFiliereName(filiereName);
+           return resourceReturnDto;
+       }else{
+           Path path = Paths.get("src/main/resources/static/fichiers/" + updateResourceDto.getData().getOriginalFilename());
+           // Assurez-vous que le répertoire existe
+           Files.createDirectories(path.getParent());
+           try {
+               Files.copy(updateResourceDto.getData().getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+               String filePath="/fichiers/"+updateResourceDto.getData().getOriginalFilename();
 
-         //preparer la reponse au client
-         ResourceReturnDto resourceReturnDto1=new ResourceReturnDto();
-         resourceReturnDto1.setId(resources1.getIdResource());
-         resourceReturnDto1.setNom(resources1.getNom());
-         resourceReturnDto1.setData(resources1.getData());
-         resourceReturnDto1.setLien(resources1.getLien());
-         resourceReturnDto1.setType(resources1.getType());
-         resourceReturnDto1.setDataType(resources1.getDataType());
-         resourceReturnDto1.setModuleName(resources1.getModule().getModuleName());
-         resourceReturnDto1.setModuleId(resources1.getModule().getModuleId());
-         String filiereName = resources1.getModule().getFiliere().getNomFiliere();
-         resourceReturnDto1.setFiliereName(filiereName);
-         //return response(Resources)
-         return resourceReturnDto1;
+
+               //update fichier
+               updateResources.setNom(updateResourceDto.getNom());
+               updateResources.setType(updateResourceDto.getType());
+               updateResources.setDataType(updateResourceDto.getDataType());
+               updateResources.setLien(filePath);// chemin relatif
+               updateResources.setModule(module.get());
+               updateResources.setProfesseur(professeur.get());
+               Resources resources1=resourcesRepository.save(updateResources);
+               //retourner fichier
+               ResourceReturnDto resourceReturnDto=new ResourceReturnDto();
+               resourceReturnDto.setId(resources1.getIdResource());
+               resourceReturnDto.setNom(resources1.getNom());
+               resourceReturnDto.setLien(resources1.getLien());
+               resourceReturnDto.setType(resources1.getType());
+               resourceReturnDto.setDataType(resources1.getDataType());
+               resourceReturnDto.setModuleName(resources1.getModule().getModuleName());
+               resourceReturnDto.setModuleId(resources1.getModule().getModuleId());
+               String filiereName = resources1.getModule().getFiliere().getNomFiliere();
+               resourceReturnDto.setFiliereName(filiereName);
+               resourceReturnDto.setProfessorId(resources1.getProfesseur().getId());
+               return resourceReturnDto;
+           }catch (IOException e){
+               e.printStackTrace();
+           }
+       }
+        return null;
 
      }
 

@@ -12,4 +12,5 @@ public class ReturnModuleDto {
     private String name;
     private String Semestre;
     private String FiliereName;
+    private String description;
 }

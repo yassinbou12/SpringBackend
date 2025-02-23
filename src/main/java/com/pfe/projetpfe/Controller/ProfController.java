@@ -11,6 +11,7 @@ import com.pfe.projetpfe.service.ProfesseurService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import  com.pfe.projetpfe.entity.Module;
@@ -21,7 +22,6 @@ import java.util.Optional;
 @RestController()
 @RequestMapping("/api/professeur")
 @PreAuthorize("hasRole('PROFESSEUR')")
-
 public class ProfController {
     ProfesseurRepository professeurRepository;
     FiliereRepository filiereRepository;
@@ -48,8 +48,8 @@ public class ProfController {
     }
     @GetMapping(path="/getAllFiliere")
     public ResponseEntity<?> getAllFiliere() {
-        List<ReturnFiliereDto> filiereList = adminService.getAllFilieres();
         try {
+            List<ReturnFiliereDto> filiereList = adminService.getAllFilieres();
             return ResponseEntity.ok().body(filiereList);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -58,8 +58,8 @@ public class ProfController {
     //Gestion des modules
     @PostMapping(path="/AddNewModule")
     public ResponseEntity<?> AddNewModule(@RequestBody AddModuleDto moduleAjouterDto){
-        ReturnModuleDto returnModuleDto =professeurService.addModule(moduleAjouterDto);
         try {
+            ReturnModuleDto returnModuleDto =professeurService.addModule(moduleAjouterDto);
             return ResponseEntity.ok(returnModuleDto);
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -77,8 +77,8 @@ public class ProfController {
     }
     @PutMapping(path="/ModifyModule")
     public ResponseEntity<?> ModifyModule(@RequestBody ReturnModuleDto returnModuleDto){
-        ReturnModuleDto returnModuleDto1 =professeurService.updateModule(returnModuleDto);
         try {
+            ReturnModuleDto returnModuleDto1 =professeurService.updateModule(returnModuleDto);
             return ResponseEntity.ok(returnModuleDto1);
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -109,6 +109,15 @@ public class ProfController {
             return ResponseEntity.ok(resourceReturnDto1);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    @DeleteMapping(path="/deleteResource/{id}")
+    public ResponseEntity<?> deleteResource(@PathVariable Long id){
+        try {
+            resourcesRepository.deleteById(id);
+            return ResponseEntity.ok().body("Resource deleted successfully");
+        }catch (Exception e) {
+            return ResponseEntity.badRequest().body("resource not found");
         }
     }
 

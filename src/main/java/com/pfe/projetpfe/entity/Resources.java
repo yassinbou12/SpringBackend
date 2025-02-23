@@ -1,6 +1,7 @@
 package com.pfe.projetpfe.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import lombok.*;
 
 @Entity
@@ -17,12 +18,12 @@ public class Resources {
     private ResourcesType type;
     @Enumerated(EnumType.STRING)
     private DataType dataType;
-    @Lob
-    private byte[] data;
     private String lien;
     @ManyToOne
     @JoinColumn(name="moduleId")
     private Module module;
+    @ManyToOne
+    private Professeur professeur;
 
 
 

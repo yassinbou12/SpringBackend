@@ -1,5 +1,6 @@
 package com.pfe.projetpfe.Dto;
 
+import jakarta.validation.constraints.Max;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,4 +14,6 @@ public class AddModuleDto {
     String name;
     String semestre;
     String filiereName;
+    @Max(9000)
+    String description;
 }

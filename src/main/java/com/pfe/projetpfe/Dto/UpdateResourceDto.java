@@ -24,5 +24,6 @@ public class UpdateResourceDto {
     private String lien;
     private String moduleName;
     private Long moduleId;
+    private Long professorId;
     private String filiereName;
 }
