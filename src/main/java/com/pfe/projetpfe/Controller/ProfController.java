@@ -120,5 +120,13 @@ public class ProfController {
             return ResponseEntity.badRequest().body("resource not found");
         }
     }
+    @GetMapping(path="/getAllResources")
+    public ResponseEntity<?> getAllResources() {
+        try {
+            return ResponseEntity.ok().body(professeurService.getAllResources());
+        }catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
 }

@@ -44,6 +44,7 @@ public class ProfesseurServiceImp implements ProfesseurService {
             returnModuleDto.setId(module.getModuleId());
             returnModuleDto.setName(module.getModuleName());
             returnModuleDto.setSemestre(module.getSemestre());
+            returnModuleDto.setDescription(module.getDescription());
             returnModuleDto.setFiliereName(module.getFiliere().getNomFiliere());
             moduleListDto.add(returnModuleDto);
         }
@@ -264,5 +265,29 @@ public class ProfesseurServiceImp implements ProfesseurService {
         return null;
 
      }
+
+    @Override
+    public List<ResourceReturnDto> getAllResources() throws Exception {
+        List<Resources> resources=resourcesRepository.findAll();
+        if (resources.isEmpty()){
+            new RuntimeException("aucune ressource trouver au moment");
+        }
+        List<ResourceReturnDto> resourceReturnDtos=new ArrayList<>();
+        for(Resources resource:resources){
+            ResourceReturnDto resourceReturnDto=new ResourceReturnDto();
+            resourceReturnDto.setId(resource.getIdResource());
+            resourceReturnDto.setNom(resource.getNom());
+            resourceReturnDto.setDataType(resource.getDataType());
+            resourceReturnDto.setLien(resource.getLien());
+            resourceReturnDto.setType(resource.getType());
+            resourceReturnDto.setModuleName(resource.getModule().getModuleName());
+            resourceReturnDto.setModuleId(resource.getModule().getModuleId());
+            String filiereName = resource.getModule().getFiliere().getNomFiliere();
+            resourceReturnDto.setFiliereName(filiereName);
+            resourceReturnDto.setProfessorId(resource.getProfesseur().getId());
+            resourceReturnDtos.add(resourceReturnDto);
+        }
+        return resourceReturnDtos;
+    }
 
 }

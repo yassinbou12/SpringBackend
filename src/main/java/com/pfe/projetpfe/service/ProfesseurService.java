@@ -14,5 +14,6 @@ public interface ProfesseurService {
     //gestion resources
     ResourceReturnDto addResources(AddResourceDto ajouteResourceDto) throws Exception;
     ResourceReturnDto updateResources(UpdateResourceDto updateResourceDto ) throws Exception;
+    List<ResourceReturnDto> getAllResources()throws Exception;
 }
 
