@@ -22,8 +22,7 @@ public class UpdateResourceDto {
     private DataType dataType;
     private MultipartFile data;
     private String lien;
-    private String moduleName;
     private Long moduleId;
     private Long professorId;
-    private String filiereName;
+
 }
