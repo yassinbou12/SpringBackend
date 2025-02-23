@@ -9,6 +9,7 @@ import com.pfe.projetpfe.repository.ProfesseurRepository;
 import com.pfe.projetpfe.repository.ResourcesRepository;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -22,17 +23,19 @@ import java.util.Optional;
 
 @Service
 public class ProfesseurServiceImp implements ProfesseurService {
+    private final AdminService adminService;
     ModuleRepositorie moduleRepositorie;
     FiliereRepository filiereRepository;
     ProfesseurRepository professeurRepository;
     ResourcesRepository resourcesRepository;
 
 
-    public ProfesseurServiceImp(ModuleRepositorie moduleRepositorie, FiliereRepository filiereRepository,ProfesseurRepository professeurRepository,ResourcesRepository resourcesRepository) {
+    public ProfesseurServiceImp(ModuleRepositorie moduleRepositorie, FiliereRepository filiereRepository, ProfesseurRepository professeurRepository, ResourcesRepository resourcesRepository, AdminService adminService) {
         this.moduleRepositorie = moduleRepositorie;
         this.filiereRepository = filiereRepository;
         this.professeurRepository = professeurRepository;
         this.resourcesRepository = resourcesRepository;
+        this.adminService = adminService;
     }
 
     @Override
@@ -78,12 +81,12 @@ public class ProfesseurServiceImp implements ProfesseurService {
     public ReturnModuleDto updateModule(ReturnModuleDto returnModuleDto) {
         Optional<Module> module =moduleRepositorie.findById(returnModuleDto.getId());
         if(!module.isPresent()) {
-            new RuntimeException("Module non trouvable");
+            throw  new RuntimeException("Module non trouvable");
         }
 
         Optional<Filiere> filiere=filiereRepository.findByNomFiliere(returnModuleDto.getFiliereName());
         if(!filiere.isPresent()) {
-            new RuntimeException("Filiere non trouvable");
+            throw  new RuntimeException("Filiere non trouvable");
         }
 
         Module updateMudole=module.get();
@@ -105,12 +108,12 @@ public class ProfesseurServiceImp implements ProfesseurService {
         //determiner ci le module laquelle appartinet ces Resources existe ou pas
        Optional<Module> module=moduleRepositorie.findById(ajouteResourceDto.getModuleId());
        if(!module.isPresent()) {
-           new RuntimeException("Module non trouvable");
+           throw new RuntimeException("Module non trouvable");
        }
        //determiner ci le Professeur qui ajouter ces Resources existe ou pas
         Optional<Professeur> professeur=professeurRepository.findById(ajouteResourceDto.getProfessorId());
        if(!professeur.isPresent()) {
-           new RuntimeException("Professeur non trouvable");
+           throw new RuntimeException("Professeur non trouvable");
        }
 
        //determiner le type de resources(soit Fichier(MultipartFile) soit un lien Vidoe)
@@ -187,17 +190,17 @@ public class ProfesseurServiceImp implements ProfesseurService {
          //verifier si resource exist
         Optional<Resources> resources=resourcesRepository.findById(updateResourceDto.getId());
         if(!resources.isPresent()) {
-            new RuntimeException("Resource non trouvable");
+            throw new RuntimeException("Resource non trouvable");
         }
         //verifier si le module exist
          Optional<Module> module=moduleRepositorie.findById(updateResourceDto.getModuleId());
          if(!module.isPresent()) {
-             new RuntimeException("Module non trouvable");
+             throw new RuntimeException("Module non trouvable");
          }
          //determiner ci le Professeur qui ajouter ces Resources existe ou pas
          Optional<Professeur> professeur=professeurRepository.findById(updateResourceDto.getProfessorId());
          if(!professeur.isPresent()) {
-             new RuntimeException("Professeur non trouvable");
+             throw  new RuntimeException("Professeur non trouvable");
          }
 
          //ici le resourece qui recuperer dans DB
@@ -270,7 +273,7 @@ public class ProfesseurServiceImp implements ProfesseurService {
     public List<ResourceReturnDto> getAllResourcesByProfId(Long id) throws Exception {
         List<Resources> resources=resourcesRepository.findAllByProfesseurId(id);
         if (resources.isEmpty()){
-            new RuntimeException("aucune ressource trouver au moment");
+            throw  new RuntimeException("aucune ressource trouver au moment");
         }
         List<ResourceReturnDto> resourceReturnDtos=new ArrayList<>();
         for(Resources resource:resources){
@@ -288,6 +291,21 @@ public class ProfesseurServiceImp implements ProfesseurService {
             resourceReturnDtos.add(resourceReturnDto);
         }
         return resourceReturnDtos;
+    }
+
+    @Override
+    public void updatePassword(UpdatePasswordDto updatePasswordDto) throws Exception {
+        Optional<Professeur> professeur=professeurRepository.findById(updatePasswordDto.getId());
+        if (!professeur.isPresent()){
+            throw new RuntimeException("professeur non trouver");
+        }
+        String oldPasswordHash=professeur.get().getPassword();
+        if (!BCrypt.checkpw(updatePasswordDto.getOldPassword(), oldPasswordHash)){
+            throw new RuntimeException("Old password incorrect");
+        }
+        String newPassword=adminService.encryptPassword(updatePasswordDto.getNewPassword());
+        professeur.get().setPassword(newPassword);
+        professeurRepository.save(professeur.get());
     }
 
 }

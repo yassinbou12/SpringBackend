@@ -14,6 +14,7 @@ public interface ProfesseurService {
     ResourceReturnDto addResources(AddResourceDto ajouteResourceDto) throws Exception;
     ResourceReturnDto updateResources(UpdateResourceDto updateResourceDto ) throws Exception;
     List<ResourceReturnDto> getAllResourcesByProfId(Long id)throws Exception;
+    void updatePassword(UpdatePasswordDto updatePasswordDto) throws Exception;
 
 }
 

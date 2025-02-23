@@ -5,6 +5,7 @@ import com.pfe.projetpfe.entity.*;
 import com.pfe.projetpfe.repository.AdminRepository;
 import com.pfe.projetpfe.repository.FiliereRepository;
 import com.pfe.projetpfe.repository.ProfesseurRepository;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -153,6 +154,20 @@ public class AdminServiceImp implements AdminService {
             profs.add(profDto);
         }
         return profs;
+    }
+    @Override
+    public void updatePassword(UpdatePasswordDto updatePasswordDto) throws Exception {
+        Optional<Admin> Admin=adminRepository.findById(updatePasswordDto.getId());
+        if (!Admin.isPresent()){
+            throw  new RuntimeException("Admin non trouver");
+        }
+        String oldPasswordHash=Admin.get().getPassword();
+        if (!BCrypt.checkpw(updatePasswordDto.getOldPassword(), oldPasswordHash)){
+            throw  new RuntimeException("Old password incorrect");
+        }
+        String newPassword=encryptPassword(updatePasswordDto.getNewPassword());
+        Admin.get().setPassword(newPassword);
+        adminRepository.save(Admin.get());
     }
 
 }

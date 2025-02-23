@@ -16,4 +16,5 @@ public interface AdminService {
     ReturnFiliereDto addNewFiliere(AddFiliereDto addFiliereDto);
     ReturnFiliereDto updateFiliere(ReturnFiliereDto returnFiliereDto);
     List<ReturnFiliereDto> getAllFilieres();
+    void updatePassword(UpdatePasswordDto updatePasswordDto) throws Exception;
 }

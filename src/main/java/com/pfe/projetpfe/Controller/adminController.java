@@ -137,6 +137,14 @@ public class adminController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
+    @PutMapping(path = "/updatePassword")
+    public ResponseEntity<?> updatePassword(@RequestBody UpdatePasswordDto updatePasswordDto){
+        try {
+            adminService.updatePassword(updatePasswordDto);
+            return ResponseEntity.ok().body("Password updated successfully");
+        }catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
 }
