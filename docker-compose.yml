@@ -1,0 +1,10 @@
+name: smart-plant-audit
+services:
+  jenkins:
+    extends:
+      file: jenkins.yml
+      service: jenkins
+  sonar:
+    extends:
+      file: sonar.yml
+      service: sonar
